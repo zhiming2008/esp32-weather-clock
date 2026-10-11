@@ -1,0 +1,65 @@
+name: 编译检查
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# 同一个分支连续推送时，只保留最新一次运行，省 CI 配额
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: PlatformIO 编译
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 安全检查 · 确认密钥文件未被提交
+        # include/secrets.h 里放的是真实 API Key，一旦入库就是公开泄露。
+        # 这里做成硬失败：万一 .gitignore 被改坏，构建会立刻红掉。
+        run: |
+          if git ls-files --error-unmatch include/secrets.h >/dev/null 2>&1; then
+            echo "::error file=include/secrets.h::密钥文件被提交到仓库，请立即删除并重置 API Key"
+            exit 1
+          fi
+          echo "OK：include/secrets.h 不在版本控制中"
+
+      - name: 缓存 PlatformIO 核心与工具链
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            .pio
+          # platformio.ini 一变（换库、改版本）就重新拉，避免用旧依赖
+          key: pio-${{ hashFiles('platformio.ini') }}
+          restore-keys: pio-
+
+      - name: 安装 PlatformIO
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install --upgrade platformio
+
+      - name: 编译固件
+        # 仓库里没有 include/secrets.h，main.cpp 会走 __has_include 的占位符分支，
+        # 因此这里不需要任何密钥就能编译通过（天气功能在无 Key 时只影响运行期表现）
+        run: pio run
+
+      - name: 上传固件产物
+        # 方便没有本地 PlatformIO 的人直接下载烧录，省去装工具链
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp32-weather-clock-firmware
+          path: |
+            .pio/build/esp32dev/firmware.bin
+            .pio/build/esp32dev/bootloader.bin
+            .pio/build/esp32dev/partitions.bin
+          if-no-files-found: warn
+          retention-days: 30

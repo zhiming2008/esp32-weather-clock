@@ -1,5 +1,7 @@
 # ESP32 联网天气时钟
 
+![编译检查](https://github.com/zhiming2008/esp32-weather-clock/actions/workflows/ci.yml/badge.svg)
+
 > 3.5 寸彩屏上的实时时钟 + 和风天气 + 本地温湿度，纯 WiFi 联网，无 SD 卡依赖。
 > 用 PlatformIO 开发，代码按模块拆分，全中文注释。
 
@@ -64,6 +66,10 @@ pio run                  # 编译
 pio run -t upload        # 烧录
 pio device monitor       # 打开串口看日志（115200）
 ```
+
+> 仓库内置 GitHub Actions：每次 push 和 PR 会自动编译，
+> 顶部徽章显示当前状态；编译产物（`firmware.bin` / `bootloader.bin` /
+> `partitions.bin`）可在 Actions 页面直接下载，不用本地装 PlatformIO 也能烧录。
 
 ### 4. 配网
 
