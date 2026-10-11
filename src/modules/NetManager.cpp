@@ -34,7 +34,7 @@ void NetManager::begin() {
                 WIFI_CONNECT_TIMEOUT_S);
 
   WiFi.mode(WIFI_STA);
-  WiFi.setHostname(WIFI_HOST_NAME);
+  WiFi.setHostname(DEVICE_HOSTNAME);
   WiFi.setAutoReconnect(true);
 
   const uint32_t startMs = millis();
@@ -52,7 +52,7 @@ void NetManager::begin() {
     _connected = true;
     Serial.printf("[Net] 已连接：%s  IP=%s\n",
                   WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
-    MDNS.begin(WIFI_HOST_NAME);
+    MDNS.begin(DEVICE_HOSTNAME);
     MDNS.addService("http", "tcp", 80);
     setLed(true);
   } else {
@@ -94,6 +94,10 @@ void NetManager::loop() {
 
 bool NetManager::connected() const {
   return WiFi.status() == WL_CONNECTED;
+}
+
+String NetManager::softApIp() const {
+  return WiFi.softAPIP().toString();
 }
 
 void NetManager::forget() {

@@ -42,7 +42,7 @@ void Display::drawFrame() {
 
 void Display::drawClock(const DateTimeInfo& t) {
   if (!t.valid) {
-    showStatus(F("正在同步时间..."));
+    showStatus("正在同步时间...");
     return;
   }
 
@@ -92,13 +92,17 @@ void Display::drawClock(const DateTimeInfo& t) {
   _tft.setTextSize(1);
 
   // ---- 星期：中文，走自制字库 ----
+  // 注意：这里用普通字符串字面量而不是 F()。当前框架是 Arduino-ESP32
+  // core 2.0.17（platform espressif32 7.1.3），它的 WString 没有提供
+  // `__FlashStringHelper* + String` 的 operator+ 重载，
+  // 用 F() 拼接会报 "conversion ... is ambiguous"。
   static const char* const kWeekday[7] = {
-      F("周日"), F("周一"), F("周二"), F("周三"),
-      F("周四"), F("周五"), F("周六")};
+      "周日", "周一", "周二", "周三", "周四", "周五", "周六"};
 
   _tft.loadFont(Deng28);
   _tft.setTextColor(Palette::Text);
-  _tft.drawString(kWeekday[t.weekday % 7], Layout::WEEKDAY_X, Layout::DATE_Y);
+  _tft.drawString(String(kWeekday[t.weekday % 7]),
+                  Layout::WEEKDAY_X, Layout::DATE_Y);
   _tft.unloadFont();
 }
 
@@ -106,7 +110,8 @@ void Display::drawWeather(const WeatherNow& w) {
   if (!w.valid) {
     _tft.loadFont(Deng28);
     _tft.setTextColor(Palette::Text);
-    _tft.drawString(F("天气获取失败"), Layout::WEATHER_X1, Layout::WEATHER_Y1);
+    _tft.drawString(String("天气获取失败"),
+                    Layout::WEATHER_X1, Layout::WEATHER_Y1);
     _tft.unloadFont();
     return;
   }
@@ -114,15 +119,16 @@ void Display::drawWeather(const WeatherNow& w) {
   _tft.loadFont(Deng28);
   _tft.setTextColor(Palette::Text);
 
-  _tft.drawString(F("天气:") + w.text,
+  // 拼接一律用普通字面量（原因见 drawClock 里的注释）
+  _tft.drawString("天气:" + w.text,
                   Layout::WEATHER_X1, Layout::WEATHER_Y1);
   _tft.drawString(withUnit(w.temp, "℃"),
                   Layout::WEATHER_X1, Layout::WEATHER_Y2);
-  _tft.drawString(F("体感:") + withUnit(w.feelsLike, "℃"),
+  _tft.drawString("体感:" + withUnit(w.feelsLike, "℃"),
                   Layout::FEEL_X, Layout::FEEL_Y);
-  _tft.drawString(F("湿度:") + withUnit(w.humidity, "%"),
+  _tft.drawString("湿度:" + withUnit(w.humidity, "%"),
                   Layout::HUMID_X, Layout::HUMID_Y);
-  _tft.drawString(F("风力:") + w.windScale + F("级"),
+  _tft.drawString("风力:" + w.windScale + "级",
                   Layout::WIND_X, Layout::WIND_Y);
 
   _tft.unloadFont();
@@ -138,12 +144,12 @@ void Display::drawClimate(const ClimateReading& c) {
   _tft.setTextColor(Palette::Text);
 
   if (c.valid) {
-    _tft.drawString(F("温度:") + String(c.temperature, 1) + F("℃"),
+    _tft.drawString("温度:" + String(c.temperature, 1) + "℃",
                     Layout::SENSOR_BOX_X + 2, 20);
-    _tft.drawString(F("湿度:") + String(c.humidity, 1) + F("%"),
+    _tft.drawString("湿度:" + String(c.humidity, 1) + "%",
                     Layout::SENSOR_BOX_X + 2, 100);
   } else {
-    _tft.drawString(F("传感器读取失败"), Layout::SENSOR_BOX_X + 2, 20);
+    _tft.drawString(String("传感器读取失败"), Layout::SENSOR_BOX_X + 2, 20);
   }
 
   _tft.unloadFont();

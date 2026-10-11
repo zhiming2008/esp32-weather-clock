@@ -23,6 +23,10 @@ class NetManager {
 
   bool connected() const;
 
+  /// 配网模式下热点网关地址（形如 "192.168.4.1"），
+  /// 主循环要显示给用户，不该直接依赖 WiFi 全局对象
+  String softApIp() const;
+
   /// 清除 NVS 中保存的 WiFi 凭据
   static void forget();
 

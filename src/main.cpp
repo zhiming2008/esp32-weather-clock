@@ -81,7 +81,7 @@ void serviceBootButton() {
   if (g_bootPressed &&
       static_cast<uint32_t>(millis() - g_bootDownMs) > BOOT_HOLD_MS) {
     Serial.println(F("[Main] 检测到长按 BOOT 键，清除 WiFi 凭据"));
-    g_display.showStatus(F("正在清除 WiFi"), F("设备即将重启"));
+    g_display.showStatus("正在清除 WiFi", "设备即将重启");
     delay(1500);
     NetManager::forget();
     ESP.restart();
@@ -104,10 +104,9 @@ void setup() {
 
   if (!g_net.connected()) {
     g_state = RunState::kProvisioning;
-    g_display.showStatus(F("正在配置 WiFi"),
-                         F("请连接热点 " WIFI_AP_SSID));
+    g_display.showStatus("正在配置 WiFi", "请连接热点 " WIFI_AP_SSID);
     Serial.printf("[Main] 等待配网，浏览器打开 http://%s\n",
-                  WiFi.softAPIP().toString().c_str());
+                  g_net.softApIp().c_str());
     return;
   }
 
@@ -117,7 +116,7 @@ void setup() {
   // 先给一句"正在取数据"，因为 HTTPS 请求是阻塞的（最长 8s 超时），
   // 否则上电后会有几秒黑屏。之后 drawWeather 会把结果画上去，
   // 最后补画分隔线（showStatus 是全屏清屏，会把线擦掉）。
-  g_display.showStatus(F("正在获取天气..."));
+  g_display.showStatus("正在获取天气...");
   refreshWeather(true);
   g_display.drawFrame();
 }

@@ -41,7 +41,9 @@
 // ==================== 系统常量 ====================
 
 #define WIFI_CONNECT_TIMEOUT_S   15
-#define WIFI_HOSTNAME     "esp32-weather-clock"
+// 设备名。注意不要叫 WIFI_HOSTNAME —— 那是 Arduino-ESP32 核心自带的
+// 宏/常量，同名会冲突（编译期重定义，或调用到库自带的那个）。
+#define DEVICE_HOSTNAME   "esp32-weather-clock"
 #define WIFI_AP_SSID      "ESP32-Weather-Setup"
 #define WIFI_AP_PASSWORD  "12345678"     // 至少 8 位
 
@@ -117,11 +119,16 @@ constexpr int16_t WIND_Y           = 276;   // 风力等级
 
 }  // namespace Layout
 
-// ==================== 配色 ====================
+// ==================== 配色（RGB565）====================
+// 这里直接写数值，而不是引用 TFT_BLACK / TFT_WHITE 这些宏。
+// 因为那些宏由 TFT_eSPI 定义，而 config.h 被 Sensor、NetManager、main
+// 都 include 了 —— 一旦引用 TFT 宏，等于让所有模块都依赖 TFT_eSPI。
+// 改成自带数值后 config.h 就是零依赖的纯配置头文件。
+// 数值与 TFT_eSPI 中的定义完全一致。
 namespace Palette {
-constexpr uint16_t Background = TFT_BLACK;
-constexpr uint16_t Text       = TFT_WHITE;
-constexpr uint16_t Accent     = TFT_CYAN;    // 时分
-constexpr uint16_t Secondary  = TFT_YELLOW;  // 月日
-constexpr uint16_t Alert      = TFT_RED;     // 秒
+constexpr uint16_t Background = 0x0000;   // 同 TFT_BLACK
+constexpr uint16_t Text       = 0xFFFF;   // 同 TFT_WHITE
+constexpr uint16_t Accent     = 0x07FF;   // 同 TFT_CYAN    时:分
+constexpr uint16_t Secondary  = 0xFFE0;   // 同 TFT_YELLOW  月/日
+constexpr uint16_t Alert      = 0xF800;   // 同 TFT_RED     秒
 }  // namespace Palette
