@@ -10,7 +10,7 @@
  *     函数体里却当数组用 data[i]（i 0..2），调用者传数组指针才行，
  *     签名与实现不一致。这里签名直接写成数组。
  *
- * API 文档：https://devapi.qweather.com/docs/api/
+ * API 文档：https://dev.qweather.com/docs/api/
  */
 #pragma once
 

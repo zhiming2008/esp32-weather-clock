@@ -51,10 +51,10 @@ cp include/secrets.example.h include/secrets.h
 
 > `include/secrets.h` 已写进 `.gitignore`，不会被提交。
 > **API Key 泄露会被人刷配额**，泄露后请立刻到
-> [和风天气控制台](https://devapi.qweather.com/) 重置。
+> [和风天气控制台](https://console.qweather.com/home) 重置。
 >
 > 城市 ID 查询入口：
-> [City Lookup](https://devapi.qweather.com/docs/geo/city-lookup.html)，
+> [城市列表](https://dev.qweather.com/docs/resource/location-list/)，
 > 也可以直接填经纬度，例如 `"116.41,39.92"`。
 
 ### 3. 编译与烧录
