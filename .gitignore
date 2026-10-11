@@ -1,0 +1,25 @@
+# ---- PlatformIO ----
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# ---- 密钥：绝不入库 ----
+include/secrets.h
+
+# ---- IDE / 编辑器 ----
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.code-workspace
+*.bak
+*.bk
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# ---- 构建产物 ----
+*.o
+*.elf
+*.bin
+*.map
